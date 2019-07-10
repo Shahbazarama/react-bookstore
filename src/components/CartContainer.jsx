@@ -14,9 +14,13 @@ function CartContainer({booksInCart, removeFromCart}) {
               {book.title}
             </li>
           )
-        }) : <h2>empty cart</h2> }
+        })
+         : <h2>empty cart</h2> }
 
       </ul>
+      <h2><u>Total Cost</u>: ${booksInCart.reduce((acc, currentValue) => {
+        return acc + currentValue.price
+      }, 0)}</h2>
     </div>
   )
 }
