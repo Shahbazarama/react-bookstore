@@ -5,9 +5,20 @@ import Bookshelf from './Bookshelf'
 
 class BookContainer extends React.Component {
 
-  state = {
-    books: [],
+  constructor(props) {
+      super(props)
+      this.state = {
+        books: [],
+      }
+
+      this.savedBooks = []
+      this.cartBooks = []
+      this.searchSort = this.searchSort.bind(this);
+      this.sortByTitle = this.sortByTitle.bind(this);
+      this.sortByAuthor = this.sortByAuthor.bind(this);
   }
+
+
 
   async componentDidMount() {
     try{
@@ -18,6 +29,7 @@ class BookContainer extends React.Component {
       this.setState({
         books: books
       })
+      this.savedBooks = this.state.books
 
     } catch (e) {
       alert(e)
@@ -30,13 +42,11 @@ class BookContainer extends React.Component {
         method: 'PATCH'
       })
 
-      const res = await fetch('http://localhost:8082/api/books')
-      if(!res.ok) throw new Error()
-      const books = await res.json()
-      this.setState({
-        books: books
-      })
+      let index = this.state.books.findIndex(book => book.id === id)
 
+      this.cartBooks.push(this.state.books[index])
+
+      this.forceUpdate()
     } catch(e) {
       alert(e)
     }
@@ -49,30 +59,50 @@ class BookContainer extends React.Component {
         method: 'PATCH'
       })
 
-      const res = await fetch('http://localhost:8082/api/books')
-
-      if(!res.ok) throw new Error()
-      const books = await res.json()
-      this.setState({
-        books: books
-      })
+      let cartIndex = this.cartBooks.findIndex(book => book.id === id)
+      this.cartBooks.splice(cartIndex, 1)
+      this.setState(prevState => ({
+        books: prevState.books
+      }))
     } catch(e) {
       alert(e)
     }
+  }
 
+  searchSort(e) {
+    let allBooks = this.savedBooks
+    let searchedBooks = allBooks.filter(book => book.title.toLowerCase().includes(e.target.value) === true)
+    this.setState({
+      books: searchedBooks
+    })
+  }
+
+  sortByTitle(){
+    let sortedBooks = this.state.books
+    sortedBooks.sort((a, b) => a.title.localeCompare(b.title))
+    this.setState({
+      books: sortedBooks
+    })
+  }
+
+  sortByAuthor(){
+    let sortedBooks = this.state.books
+    sortedBooks.sort((a, b) => a.author.localeCompare(b.author))
+    this.setState({
+      books: sortedBooks
+    })
   }
 
   render() {
-    const cartItems = this.state.books.filter(book => book.inCart === true)
     return (
       <div className="container">
         <div className="row">
-          <div className="col-9">
+          <div className="col-8">
             <h1> Books </h1>
-            <Bookshelf books={this.state.books} addBookToCart={this.addBookToCart}/>
+            <Bookshelf books={this.state.books} addBookToCart={this.addBookToCart} handleSearch={this.searchSort} sortByTitle={this.sortByTitle} sortByAuthor={this.sortByAuthor}/>
           </div>
-          <div className="col-3">
-            <CartContainer booksInCart={cartItems} removeFromCart={this.removeFromCart}/>
+          <div className="col-4">
+            <CartContainer booksInCart={this.cartBooks} removeFromCart={this.removeFromCart}/>
           </div>
         </div>
 

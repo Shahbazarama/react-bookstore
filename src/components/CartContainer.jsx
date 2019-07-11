@@ -2,20 +2,18 @@ import React from 'react'
 
 function CartContainer({booksInCart, removeFromCart}) {
 
-
   return (
     <div>
       <h1>Cart</h1>
-      <ul>
+      <ul className="list-group">
         {booksInCart.length > 0 ? booksInCart.map(book => {
           return (
-            <li key={book.id}>
-              <button className='btn btn-danger' onClick={() => removeFromCart(book.id)}>Remove from cart</button>
+            <li className="list-group-item" key={book.id}>
               {book.title}
             </li>
           )
         })
-         : <h2>empty cart</h2> }
+         : <h2>is empty</h2> }
 
       </ul>
       <h2><u>Total Cost</u>: ${booksInCart.reduce((acc, currentValue) => {
